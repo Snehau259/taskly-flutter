@@ -31,6 +31,11 @@ class HomeState extends State<Home> {
               color: Colors.red[500]),
         )
       ]),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.cyan,
+        onPressed: () {},
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
