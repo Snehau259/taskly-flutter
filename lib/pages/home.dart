@@ -59,17 +59,15 @@ class HomeState extends State<Home> {
         // future: Future.delayed(Duration(seconds: 2)),
         future: Hive.openBox('tasks'),
         builder: (BuildContext _context, AsyncSnapshot snapshot) {
-          print(snapshot.connectionState);
           if (snapshot.connectionState == ConnectionState.done) {
             box = snapshot.data;
-            print(box);
+            print("snp data ${box}");
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else {
               return singleTaskTile();
             }
           } else {
-            print(snapshot.connectionState);
             return Center(
               child: CircularProgressIndicator(),
             );
@@ -78,18 +76,31 @@ class HomeState extends State<Home> {
   }
 
   Widget singleTaskTile() {
-    return ListView(
-      children: [
-        ListTile(
+    // Task newTask =
+    //     new Task(content: "Go for a trip", timestamp: DateTime.now(), done: false);
+    //     box?.add(newTask.toMap());
+    // print("new task to map=${newTask.toMap()}");
+
+    List tasks = box!.values.toList();
+    // print("tasks=${tasks}");
+
+    return ListView.builder(
+      itemCount: tasks.length,
+      itemBuilder: (context, index) {
+        var task = Task.fromMap(tasks[index]);
+        return ListTile(
             title: Text(
-              'Eat well000',
+              task.content,
               style: TextStyle(
-                  decoration: TextDecoration.lineThrough, fontSize: 20),
+                  decoration: task.done ? TextDecoration.lineThrough : null,
+                  fontSize: 20),
             ),
-            subtitle: Text(DateTime.now().toString()),
-            trailing: Icon(Icons.check_box_outline_blank_outlined,
-                color: Colors.red[500]))
-      ],
+            subtitle: Text(task.timestamp.toString()),
+            trailing: task.done
+                ? Icon(Icons.check_box_outlined, color: Colors.red[500])
+                : Icon(Icons.check_box_outline_blank_outlined,
+                    color: Colors.red[500]));
+      },
     );
   }
 }
