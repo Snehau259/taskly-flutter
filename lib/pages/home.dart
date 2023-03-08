@@ -36,34 +36,6 @@ class HomeState extends State<Home> {
     );
   }
 
-  // void addNewTask() {
-  //   showDialog(
-  //       context: context,
-  //       builder: (BuildContext _context) {
-  //         return AlertDialog(
-  //           title: Text('Add task'),
-  //           content: TextField(
-  //             onSubmitted: (value) {
-  //               print("task content from show dialog=${taskContent}");
-  //               if (taskContent != null) {
-  //                 Task newTask = new Task(
-  //                     content: taskContent!,
-  //                     timestamp: DateTime.now(),
-  //                     done: false);
-  //                 print(newTask.toMap());
-  //                 box?.add(newTask.toMap());
-  //               }
-  //               setState(() {
-  //                 taskContent = value;
-  //                 Navigator.pop(_context);
-  //                 // viewTasks();
-  //               });
-  //             },
-  //             onChanged: (value) {},
-  //           ),
-  //         );
-  //       });
-  // }
 
   void addNewTask() {
     showDialog(
@@ -76,12 +48,10 @@ class HomeState extends State<Home> {
                 taskContent = value;
               },
               onSubmitted: (value) {
-                // print(taskContent);
+             
                 setState(() {
                   Navigator.pop(_context);
-                  // taskContent = null;
-
-                  // viewTasks();
+                 
                 });
                 print("taskContent from show dialog ${taskContent}");
                 if (taskContent != null) {
@@ -99,7 +69,6 @@ class HomeState extends State<Home> {
 
   Widget viewTaskLists() {
     return FutureBuilder(
-        // future: Future.delayed(Duration(seconds: 2)),
         future: Hive.openBox('tasks'),
         builder: (BuildContext _context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
@@ -119,10 +88,6 @@ class HomeState extends State<Home> {
   }
 
   Widget singleTaskTile() {
-    // Task newTask =
-    //     new Task(content: "Go to gym", timestamp: DateTime.now(), done: false);
-    // box?.add(newTask.toMap());
-    // print("new task to map=${newTask.toMap()}");
 
     List tasks = box!.values.toList();
     print("tasks=${tasks}");
