@@ -17,10 +17,11 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    print("task content from main home=${taskContent}");
     deviceWidth = MediaQuery.of(context).size.width;
     deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(title: Text("Taskly",style: TextStyle(fontSize: 30),),
         backgroundColor: Colors.cyan[500],
         toolbarHeight: deviceHeight * 0.15,
       ),
@@ -35,6 +36,35 @@ class HomeState extends State<Home> {
     );
   }
 
+  // void addNewTask() {
+  //   showDialog(
+  //       context: context,
+  //       builder: (BuildContext _context) {
+  //         return AlertDialog(
+  //           title: Text('Add task'),
+  //           content: TextField(
+  //             onSubmitted: (value) {
+  //               print("task content from show dialog=${taskContent}");
+  //               if (taskContent != null) {
+  //                 Task newTask = new Task(
+  //                     content: taskContent!,
+  //                     timestamp: DateTime.now(),
+  //                     done: false);
+  //                 print(newTask.toMap());
+  //                 box?.add(newTask.toMap());
+  //               }
+  //               setState(() {
+  //                 taskContent = value;
+  //                 Navigator.pop(_context);
+  //                 // viewTasks();
+  //               });
+  //             },
+  //             onChanged: (value) {},
+  //           ),
+  //         );
+  //       });
+  // }
+
   void addNewTask() {
     showDialog(
         context: context,
@@ -42,13 +72,26 @@ class HomeState extends State<Home> {
           return AlertDialog(
             title: Text('Add task'),
             content: TextField(
+              onChanged: (value) {
+                taskContent = value;
+              },
               onSubmitted: (value) {
+                // print(taskContent);
                 setState(() {
-                  taskContent = value;
+                  Navigator.pop(_context);
+                  // taskContent = null;
+
                   // viewTasks();
                 });
+                print("taskContent from show dialog ${taskContent}");
+                if (taskContent != null) {
+                  Task newTask = new Task(
+                      content: taskContent!,
+                      timestamp: DateTime.now(),
+                      done: false);
+                  box?.add(newTask.toMap());
+                }
               },
-              onChanged: (value) {},
             ),
           );
         });
@@ -59,7 +102,7 @@ class HomeState extends State<Home> {
         // future: Future.delayed(Duration(seconds: 2)),
         future: Hive.openBox('tasks'),
         builder: (BuildContext _context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
             box = snapshot.data;
             print("snp data ${box}");
             if (snapshot.hasError) {
@@ -77,29 +120,40 @@ class HomeState extends State<Home> {
 
   Widget singleTaskTile() {
     // Task newTask =
-    //     new Task(content: "Go for a trip", timestamp: DateTime.now(), done: false);
-    //     box?.add(newTask.toMap());
+    //     new Task(content: "Go to gym", timestamp: DateTime.now(), done: false);
+    // box?.add(newTask.toMap());
     // print("new task to map=${newTask.toMap()}");
 
     List tasks = box!.values.toList();
-    // print("tasks=${tasks}");
+    print("tasks=${tasks}");
 
     return ListView.builder(
       itemCount: tasks.length,
       itemBuilder: (context, index) {
         var task = Task.fromMap(tasks[index]);
         return ListTile(
-            title: Text(
-              task.content,
-              style: TextStyle(
-                  decoration: task.done ? TextDecoration.lineThrough : null,
-                  fontSize: 20),
-            ),
-            subtitle: Text(task.timestamp.toString()),
-            trailing: task.done
-                ? Icon(Icons.check_box_outlined, color: Colors.red[500])
-                : Icon(Icons.check_box_outline_blank_outlined,
-                    color: Colors.red[500]));
+          title: Text(
+            task.content,
+            style: TextStyle(
+                decoration: task.done ? TextDecoration.lineThrough : null,
+                fontSize: 20),
+          ),
+          subtitle: Text(task.timestamp.toString()),
+          trailing: task.done
+              ? Icon(Icons.check_box_outlined, color: Colors.red[500])
+              : Icon(Icons.check_box_outline_blank_outlined,
+                  color: Colors.red[500]),
+          onTap: () {
+            setState(() {
+              task.done = !task.done;
+              box?.putAt(index, task.toMap());
+            });
+          },
+          onLongPress: () {
+            box?.deleteAt(index);
+            setState(() {});
+          },
+        );
       },
     );
   }
