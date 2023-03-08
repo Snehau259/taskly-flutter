@@ -7,7 +7,7 @@ class Task {
 
   Task({required this.content, required this.timestamp, required this.done});
 
-  Map toMap(task) {
+  Map toMap() {
     return {"content": content, "done": done, "date": timestamp};
   }
 
